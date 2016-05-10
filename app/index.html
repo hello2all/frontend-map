@@ -26,11 +26,17 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <nav id="myNavmenu" class="navmenu navmenu-inverse navmenu-fixed-left offcanvas" role="navigation">
-      <a class="navmenu-brand" href="#">Brand</a>
-      <ul class="nav navmenu-nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a href="#">Link</a></li>
-        <li><a href="#">Link</a></li>
+      <a class="navmenu-brand" href="#">Local Guide</a>
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Location filter">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button">
+            <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+          </button>
+        </span>
+      </div>
+      <ul class="nav navmenu-nav" data-bind="foreach: POIs">
+        <li><a href="#" data-bind="text: name"></a></li>
       </ul>
     </nav>
     <div class="navbar navbar-default navbar-fixed-top">

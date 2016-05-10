@@ -1,11 +1,16 @@
-/*
-This is the fun part. Here's where we generate the custom Google Map for the website.
-See the documentation below for more details.
-https://developers.google.com/maps/documentation/javascript/reference
-*/
+function POIs(name){
+  self = this;
+  self.name = name;
+}
+function AppViewModel() {
+  self = this;
+  self.POIs = ko.observableArray([new POIs("Bert"),new POIs("Ted")]);
+}
+
+// Activates knockout.js
+ko.applyBindings(new AppViewModel());
+
 var map;    // declares a global map variable
-
-
 /*
 Start here! initializeMap() is called when page is loaded.
 */
