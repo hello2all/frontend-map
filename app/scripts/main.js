@@ -1,10 +1,22 @@
-function POIs(name){
-  self = this;
+function POI(name){
+  var self = this;
   self.name = name;
+  self.selected = ko.observable(false);
 }
 function AppViewModel() {
-  self = this;
-  self.POIs = ko.observableArray([new POIs("Bert"),new POIs("Ted")]);
+  var self = this;
+  self.POIs = ko.observableArray([
+    new POI("shop"),
+    new POI("hair salon"),
+    new POI("restaurant")
+  ]);
+
+  self.currentPOI = self.POIs()[0];
+  self.select = function(selectedPOI){
+    self.currentPOI.selected(false);
+    self.currentPOI = selectedPOI;
+    self.currentPOI.selected(true);
+  };
 }
 
 // Activates knockout.js
