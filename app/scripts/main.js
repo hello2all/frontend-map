@@ -1,3 +1,44 @@
+/*
+Yelp API using Node.js
+*/
+// Request API access: http://www.yelp.com/developers/getting_started/api_access
+var Yelp = require('yelp');
+
+var yelp = new Yelp({
+  consumer_key: 'Q4GbjaddQNh6WmNjdtgWyA',
+  consumer_secret: '44J9519mn_wPltW0wwIGUtIgSxs',
+  token: 'GFHbNxYxSnpwithWQb1yqPsBWim1KQoa',
+  token_secret: 'BKa0iVrD3veD0ML5dS3aWqU7CT4',
+});
+
+// See http://www.yelp.com/developers/documentation/v2/search_api
+yelp.search({ term: 'food', location: 'Montreal' })
+.then(function (data) {
+  console.log(data);
+})
+.catch(function (err) {
+  console.error(err);
+});
+
+// See http://www.yelp.com/developers/documentation/v2/business
+yelp.business('yelp-san-francisco')
+  .then(console.log)
+  .catch(console.error);
+
+yelp.phoneSearch({ phone: '+15555555555' })
+  .then(console.log)
+  .catch(console.error);
+
+// A callback based API is also available:
+yelp.business('yelp-san-francisco', function(err, data) {
+  if (err) return console.log(error);
+  console.log(data);
+});
+
+
+/*
+MVVM
+*/
 function POI(name){
   var self = this;
   self.name = name;
