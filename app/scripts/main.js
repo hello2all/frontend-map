@@ -33,7 +33,7 @@ ko.applyBindings(new AppViewModel());
 Ajax
 */
 function SearchFS(keyword){
-  keyword = keyword.ToString();
+  keyword = keyword.toString();
   var FSid = "CPTLZ2ZUS0UDLU3IQX2HXPN3CDUC1S2AULTWLI3LQRS0FHME";
   var FSclientsecret = "XA4TANSDMYHH4OCTJOOGJZZBGK1TISIKBAZFAQ11T0X40AFS";
   var FSv = "20130815";
@@ -56,7 +56,7 @@ function SearchFS(keyword){
       $.each( data.response.venues, function( i, item ) {
         console.log(item.name);
       });
-    });
+    })
     .fail(function(){
       console.log("Ajax error");
     });
