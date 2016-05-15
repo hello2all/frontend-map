@@ -1,3 +1,10 @@
+/*
+Venues
+*/
+var venues = [];
+/*
+MVVM
+*/
 function POI(name){
   var self = this;
   self.name = name;
@@ -21,6 +28,40 @@ function AppViewModel() {
 
 // Activates knockout.js
 ko.applyBindings(new AppViewModel());
+
+/*
+Ajax
+*/
+function SearchFS(keyword){
+  keyword = keyword.ToString();
+  var FSid = "CPTLZ2ZUS0UDLU3IQX2HXPN3CDUC1S2AULTWLI3LQRS0FHME";
+  var FSclientsecret = "XA4TANSDMYHH4OCTJOOGJZZBGK1TISIKBAZFAQ11T0X40AFS";
+  var FSv = "20130815";
+  var FSll = "1.293334,103.784176";
+  var FSlimit = "10";
+
+  var foursquareAPI = "https://api.foursquare.com/v2/venues/search?" +
+  "client_id="+ FSid +
+  "&client_secret=" + FSclientsecret +
+  "&v=" + FSv +
+  "&ll=" + FSll +
+  "&limit=" + FSlimit +
+  "&query=" + keyword;
+  $.getJSON( foursquareAPI, {
+    tags: "mount rainier",
+    tagmode: "any",
+    format: "json"
+  })
+    .done(function( data ) {
+      $.each( data.response.venues, function( i, item ) {
+        console.log(item.name);
+      });
+    });
+    .fail(function(){
+      console.log("Ajax error");
+    });
+}
+SearchFS("pizza");
 
 var map;    // declares a global map variable
 /*

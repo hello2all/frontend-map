@@ -6,3 +6,4 @@ bower_components
 test/bower_components
 
 app/test.html
+app/scripts/test.js
