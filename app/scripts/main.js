@@ -1,19 +1,24 @@
 /*
 MVVM
 */
+// Point of interest object
 function POI(name){
   var self = this;
   self.name = name;
-  self.selected = ko.observable(false);
+  self.selected = ko.observable(false); // Flag for selected item in list
 }
 function AppViewModel() {
   var self = this;
-  self.SearchVal = ko.observable("");
+  // initialize search string
+  self.SearchVal = ko.observable
+  // initialize Point of interests observable array
   self.POIs = ko.observableArray([]);
-
+  // Update list and map once a new search is conducted
   self.Update = function (){
     var keyword = self.SearchVal().toString();
+    // Construct search query for foursquare according to SearchVal
     function ConstructQuery(){
+      // Credentials for foursquareAPI
       var FSid = "CPTLZ2ZUS0UDLU3IQX2HXPN3CDUC1S2AULTWLI3LQRS0FHME";
       var FSclientsecret = "XA4TANSDMYHH4OCTJOOGJZZBGK1TISIKBAZFAQ11T0X40AFS";
       var FSv = "20130815";
@@ -31,6 +36,7 @@ function AppViewModel() {
       return query;
     }
     var foursquareAPI = ConstructQuery(keyword);
+    // Ajax search to get json results
     $.getJSON( foursquareAPI, {
       tagmode: "any",
       format: "json"
@@ -45,7 +51,9 @@ function AppViewModel() {
         console.log("Ajax error");
       });
   };
+  // initialize current POI
   self.currentPOI = new POI();
+  // Change focus on selected item
   self.select = function(selectedPOI){
     self.currentPOI.selected(false);
     self.currentPOI = selectedPOI;
