@@ -10,7 +10,7 @@ function POI(name){
 function AppViewModel() {
   var self = this;
   // initialize search string
-  self.SearchVal = ko.observable
+  self.SearchVal = ko.observable("");
   // initialize Point of interests observable array
   self.POIs = ko.observableArray([]);
   // Update list and map once a new search is conducted
