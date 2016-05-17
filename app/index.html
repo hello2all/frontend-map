@@ -35,7 +35,7 @@
           </button>
         </span>
       </div>
-      <ul class="nav navmenu-nav" data-bind="foreach: POIs">
+      <ul id="myNavlist" class="nav navmenu-nav" data-bind="foreach: POIs">
         <li data-bind="click: $parent.select, css: { active: selected}"><a href="#" data-bind="text: name"></a></li>
       </ul>
     </nav>
