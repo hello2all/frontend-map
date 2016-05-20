@@ -152,8 +152,8 @@ function initializeMap() {
 
   var locations;
   var mapOptions = {
-    center: new google.maps.LatLng(1.293334,103.784176),
-    zoom: 12,
+    center: new google.maps.LatLng(1.286826, 103.854543),
+    zoom: 14,
     disableDefaultUI: true
   };
   map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
@@ -166,10 +166,12 @@ function initializeMap() {
         map: map
       });
       var infowindow = new google.maps.InfoWindow({
-        content: item.name
+        content: item.name,
+        maxWidth: 300
       });
       marker.addListener('click', function() {
-        infowindow.open(map, marker);
+        CloseAllinfowindows();
+        ShowWiki(marker,infowindow,item.wikiurl);
       });
       markers.push(marker);
       infowindows.push(infowindow);
@@ -177,6 +179,12 @@ function initializeMap() {
   }
   addMarkers();
 
+  // close all infowindows
+  function CloseAllinfowindows(){
+    infowindows.forEach(function(infowindow){
+      infowindow.close();
+    });
+  }
 
   google.maps.event.addDomListener(document.getElementById('myNavlist'), 'click', function(e) {
     //window.alert('List was clicked!');
@@ -184,38 +192,40 @@ function initializeMap() {
   });
 }
 
-// var keyword = self.SearchVal().toString();
-// // Construct search query for foursquare according to SearchVal
-// function ConstructQuery(){
-//   // Credentials for foursquareAPI
-//   var FSid = "CPTLZ2ZUS0UDLU3IQX2HXPN3CDUC1S2AULTWLI3LQRS0FHME";
-//   var FSclientsecret = "XA4TANSDMYHH4OCTJOOGJZZBGK1TISIKBAZFAQ11T0X40AFS";
-//   var FSv = "20130815";
-//   var FSll = "1.293334,103.784176";
-//   var FSlimit = "10";
-//
-//   var query = "https://api.foursquare.com/v2/venues/search?" +
-//   "client_id="+ FSid +
-//   "&client_secret=" + FSclientsecret +
-//   "&v=" + FSv +
-//   "&ll=" + FSll +
-//   "&limit=" + FSlimit +
-//   "&query=" + keyword;
-//
-//   return query;
-// }
-// var foursquareAPI = ConstructQuery(keyword);
-// // Ajax search to get json results
-// $.getJSON( foursquareAPI, {
-//   tagmode: "any",
-//   format: "json"
-// })
-//   .done(function( data ) {
-//     self.POIs([]);
-//     $.each( data.response.venues, function( i, item ) {
-//       self.POIs.push(new POI(item.name));
-//     });
-//   })
-//   .fail(function(){
-//     alert("Ajax error");
-//   });
+/*
+Asynchronously retrieve info from wikipedia
+*/
+function ShowWiki(marker,infowindow,wikiurl)
+{
+  // construct parse url to retrieve the first section
+  var parseUrl = "htp://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&callback=?&page=" + wikiurl.replace("https://en.wikipedia.org/wiki/", "");
+
+  $.ajax({
+    type: "GET",
+    url: parseUrl,
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    success: function (data, textStatus, jqXHR) {
+      // parse results
+      var markup = data.parse.text["*"];
+      // convert string to jquery object for further proccessing
+      var i = $('<div></div>').html(markup);
+
+      // remove links as they will not work
+      i.find('a').each(function() { $(this).replaceWith($(this).html()); });
+      // remove any references
+      i.find('sup').remove();
+      // remove cite error
+      i.find('.mw-ext-cite-error').remove();
+      // strip out passages
+      i = i.find('p').html();
+      // load results into infowindow
+      infowindow.setContent(i);
+      infowindow.open(map,marker);
+    },
+    error: function () {
+      // throw error message
+      alert("Error on retrieving intro from wikipedia");
+    }
+  });
+}
