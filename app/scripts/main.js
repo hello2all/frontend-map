@@ -116,10 +116,20 @@ MVVM
 function POI(location){
   var self = this;
   self.name = location.name;
-  self.address = location.address;
   self.wikiurl = location.wikiurl;
-  self.lat = location.lat;
-  self.lng = location.lng;
+  self.marker = new google.maps.Marker({
+    position: new google.maps.LatLng(location.lat,location.lng),
+    map: map
+  });
+  self.infowindow = new google.maps.InfoWindow({
+    content: self.name,
+    maxWidth: 300
+  });
+
+  self.marker.addListener('click', function() {
+    self.marker.setAnimation(google.maps.Animation.BOUNCE);
+    ShowWiki(self.marker,self.infowindow,self.wikiurl);
+  });
   self.selected = ko.observable(false); // Flag for selected item in list
 }
 function AppViewModel() {
@@ -128,10 +138,16 @@ function AppViewModel() {
   self.SearchVal = ko.observable("");
   // initialize Point of interests observable array
   self.POIs = ko.observableArray([]);
-  // Update list and map once a new search is conducted
   museums.forEach(function(location){
     self.POIs.push(new POI(location));
   });
+  //
+  self.reset = function(){
+    self.POIs().forEach(function(POI){
+      POI.infowindow.close();
+      POI.marker.setAnimation(null);
+    });
+  }
   // initialize current POI
   self.currentPOI = self.POIs()[0];
   // Change focus on selected item
@@ -139,11 +155,12 @@ function AppViewModel() {
     self.currentPOI.selected(false);
     self.currentPOI = selectedPOI;
     self.currentPOI.selected(true);
+    self.reset();
+    google.maps.event.trigger(self.currentPOI.marker, 'click');
   };
 }
 
-// Activates knockout.js
-ko.applyBindings(new AppViewModel());
+
 
 var map;    // declares a global map variable
 var markers = [];
@@ -157,43 +174,8 @@ function initializeMap() {
     disableDefaultUI: true
   };
   map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-
-  // Add markers on the map.
-  function addMarkers() {
-    museums.forEach(function(item){
-      var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(item.lat,item.lng),
-        map: map
-      });
-      var infowindow = new google.maps.InfoWindow({
-        content: item.name,
-        maxWidth: 300
-      });
-      marker.addListener('click', function() {
-        Reset();
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-        ShowWiki(marker,infowindow,item.wikiurl);
-      });
-      markers.push(marker);
-      infowindows.push(infowindow);
-    });
-  }
-  addMarkers();
-
-  // close all infowindows
-  function Reset(){
-    infowindows.forEach(function(infowindow){
-      infowindow.close();
-    });
-    markers.forEach(function(marker){
-      marker.setAnimation(null);
-    });
-  }
-
-  google.maps.event.addDomListener(document.getElementById('myNavlist'), 'click', function(e) {
-    //window.alert('List was clicked!');
-    console.log(e);
-  });
+  // Activates knockout.js
+  ko.applyBindings(new AppViewModel());
 }
 
 /*
@@ -203,7 +185,7 @@ function ShowWiki(marker,infowindow,wikiurl)
 {
   // construct parse url to retrieve the first section
   var parseUrl = "http://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&callback=?&page=" + wikiurl.replace("https://en.wikipedia.org/wiki/", "");
-
+  var HTMLlink = "<p><a href='%data%'>More info...</a></p>";
   $.ajax({
     type: "GET",
     url: parseUrl,
@@ -224,7 +206,7 @@ function ShowWiki(marker,infowindow,wikiurl)
       // strip out passages
       i = i.find('p').html();
       // load results into infowindow
-      infowindow.setContent(i);
+      infowindow.setContent(i + HTMLlink.replace("%data%",wikiurl));
       infowindow.open(map,marker);
     },
     error: function () {
