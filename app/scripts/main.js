@@ -1,10 +1,125 @@
+var museums = [
+  {
+    "name": "ArtScience Museum",
+    "address": "10 Bayfront Ave.",
+    "wikiurl":"https://en.wikipedia.org/wiki/ArtScience_Museum",
+    "crossStreet": "Marina Bay Sands",
+    "lat": 1.2860434088214237,
+    "lng": 103.859703540802,
+    "distance": 8444,
+    "postalCode": "018956",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["10 Bayfront Ave. (Marina Bay Sands)", "018956", "Singapore"]
+  },
+  {
+    "name": "SAM at 8Q",
+    "address": "8 Queen St",
+    "wikiurl":"https://en.wikipedia.org/wiki/8Q_SAM",
+    "crossStreet": "Bras Basah Rd",
+    "lat": 1.2974596023559193,
+    "lng": 103.851789,
+    "distance": 7538,
+    "postalCode": "188535",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["8 Queen St (Bras Basah Rd)", "188535", "Singapore"]
+  },
+  {
+    "name": "Asian Civilisations Museum",
+    "address": "1 Empress Pl.",
+    "wikiurl":"https://en.wikipedia.org/wiki/Asian_Civilisations_Museum",
+    "crossStreet": "Fullerton Road",
+    "lat": 1.287235894855731,
+    "lng": 103.85206308368407,
+    "distance": 7585,
+    "postalCode": "179555",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["1 Empress Pl. (Fullerton Road)", "179555", "Singapore"]
+  },
+  {
+    "name": "National Galalery Singapore",
+    "address": "1 St. Andrew's Road",
+    "wikiurl":"https://en.wikipedia.org/wiki/National_Gallery_Singapore",
+    "lat": 1.2902051452344496,
+    "lng": 103.85153889656067,
+    "distance": 7504,
+    "postalCode": "178957",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["1 St. Andrew's Road", "178957", "Singapore"]
+  },
+  {
+    "name": "National Museum of Singapore",
+    "address": "93 Stamford Rd",
+    "wikiurl":"https://en.wikipedia.org/wiki/National_Museum_of_Singapore",
+    "lat": 1.2967909719264816,
+    "lng": 103.84858846664429,
+    "distance": 7178,
+    "postalCode": "178897",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["93 Stamford Rd", "178897", "Singapore"]
+  },
+  {
+    "name": "Peranakan Museum",
+    "address": "39 Armenian St.",
+    "wikiurl":"https://en.wikipedia.org/wiki/Peranakan_Museum",
+    "lat": 1.2942303498133292,
+    "lng": 103.84923223811441,
+    "distance": 7240,
+    "postalCode": "179941",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["39 Armenian St.", "179941", "Singapore"]
+  },
+  {
+    "name": "Singapore Art Museum",
+    "address": "71 Bras Basah Rd.",
+    "wikiurl":"https://en.wikipedia.org/wiki/Singapore_Art_Museum",
+    "crossStreet": "Opp SMU",
+    "lat": 1.2972674699862363,
+    "lng": 103.85109492786576,
+    "distance": 7460,
+    "postalCode": "189555",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["71 Bras Basah Rd. (Opp SMU)", "189555", "Singapore"]
+  },
+  {
+    "name": "Baba House",
+    "address": "157 Neil Rd.",
+    "wikiurl":"https://en.wikipedia.org/wiki/Baba_House",
+    "lat": 1.2775352294567568,
+    "lng": 103.83728105838811,
+    "distance": 6166,
+    "postalCode": "088883",
+    "cc": "SG",
+    "city": "Singapore",
+    "country": "Singapore",
+    "formattedAddress": ["157 Neil Rd.", "088883", "Singapore"]
+  }
+];
+
 /*
 MVVM
 */
 // Point of interest object
-function POI(name){
+function POI(location){
   var self = this;
-  self.name = name;
+  self.name = location.name;
+  self.address = location.address;
+  self.wikiurl = location.wikiurl;
+  self.lat = location.lat;
+  self.lng = location.lng;
   self.selected = ko.observable(false); // Flag for selected item in list
 }
 function AppViewModel() {
@@ -14,45 +129,11 @@ function AppViewModel() {
   // initialize Point of interests observable array
   self.POIs = ko.observableArray([]);
   // Update list and map once a new search is conducted
-  self.Update = function (){
-    var keyword = self.SearchVal().toString();
-    // Construct search query for foursquare according to SearchVal
-    function ConstructQuery(){
-      // Credentials for foursquareAPI
-      var FSid = "CPTLZ2ZUS0UDLU3IQX2HXPN3CDUC1S2AULTWLI3LQRS0FHME";
-      var FSclientsecret = "XA4TANSDMYHH4OCTJOOGJZZBGK1TISIKBAZFAQ11T0X40AFS";
-      var FSv = "20130815";
-      var FSll = "1.293334,103.784176";
-      var FSlimit = "10";
-
-      var query = "https://api.foursquare.com/v2/venues/search?" +
-      "client_id="+ FSid +
-      "&client_secret=" + FSclientsecret +
-      "&v=" + FSv +
-      "&ll=" + FSll +
-      "&limit=" + FSlimit +
-      "&query=" + keyword;
-
-      return query;
-    }
-    var foursquareAPI = ConstructQuery(keyword);
-    // Ajax search to get json results
-    $.getJSON( foursquareAPI, {
-      tagmode: "any",
-      format: "json"
-    })
-      .done(function( data ) {
-        self.POIs([]);
-        $.each( data.response.venues, function( i, item ) {
-          self.POIs.push(new POI(item.name));
-        });
-      })
-      .fail(function(){
-        alert("Ajax error");
-      });
-  };
+  museums.forEach(function(location){
+    self.POIs.push(new POI(location));
+  });
   // initialize current POI
-  self.currentPOI = new POI();
+  self.currentPOI = self.POIs()[0];
   // Change focus on selected item
   self.select = function(selectedPOI){
     self.currentPOI.selected(false);
@@ -65,6 +146,8 @@ function AppViewModel() {
 ko.applyBindings(new AppViewModel());
 
 var map;    // declares a global map variable
+var markers = [];
+var infowindows = [];
 function initializeMap() {
 
   var locations;
@@ -74,16 +157,65 @@ function initializeMap() {
     disableDefaultUI: true
   };
   map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-  // Adds a marker on the map.
-  function addMarker(location) {
-    var marker = new google.maps.Marker({
-      position: location,
-      map: map
+
+  // Add markers on the map.
+  function addMarkers() {
+    museums.forEach(function(item){
+      var marker = new google.maps.Marker({
+        position: new google.maps.LatLng(item.lat,item.lng),
+        map: map
+      });
+      var infowindow = new google.maps.InfoWindow({
+        content: item.name
+      });
+      marker.addListener('click', function() {
+        infowindow.open(map, marker);
+      });
+      markers.push(marker);
+      infowindows.push(infowindow);
     });
-    markers.push(marker);
   }
+  addMarkers();
+
+
   google.maps.event.addDomListener(document.getElementById('myNavlist'), 'click', function(e) {
-    window.alert('List was clicked!');
+    //window.alert('List was clicked!');
     console.log(e);
   });
 }
+
+// var keyword = self.SearchVal().toString();
+// // Construct search query for foursquare according to SearchVal
+// function ConstructQuery(){
+//   // Credentials for foursquareAPI
+//   var FSid = "CPTLZ2ZUS0UDLU3IQX2HXPN3CDUC1S2AULTWLI3LQRS0FHME";
+//   var FSclientsecret = "XA4TANSDMYHH4OCTJOOGJZZBGK1TISIKBAZFAQ11T0X40AFS";
+//   var FSv = "20130815";
+//   var FSll = "1.293334,103.784176";
+//   var FSlimit = "10";
+//
+//   var query = "https://api.foursquare.com/v2/venues/search?" +
+//   "client_id="+ FSid +
+//   "&client_secret=" + FSclientsecret +
+//   "&v=" + FSv +
+//   "&ll=" + FSll +
+//   "&limit=" + FSlimit +
+//   "&query=" + keyword;
+//
+//   return query;
+// }
+// var foursquareAPI = ConstructQuery(keyword);
+// // Ajax search to get json results
+// $.getJSON( foursquareAPI, {
+//   tagmode: "any",
+//   format: "json"
+// })
+//   .done(function( data ) {
+//     self.POIs([]);
+//     $.each( data.response.venues, function( i, item ) {
+//       self.POIs.push(new POI(item.name));
+//     });
+//   })
+//   .fail(function(){
+//     alert("Ajax error");
+//   });
