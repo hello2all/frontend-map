@@ -198,7 +198,7 @@ Asynchronously retrieve info from wikipedia
 function ShowWiki(marker,infowindow,wikiurl)
 {
   // construct parse url to retrieve the first section
-  var parseUrl = "htp://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&callback=?&page=" + wikiurl.replace("https://en.wikipedia.org/wiki/", "");
+  var parseUrl = "http://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&callback=?&page=" + wikiurl.replace("https://en.wikipedia.org/wiki/", "");
 
   $.ajax({
     type: "GET",
