@@ -170,7 +170,8 @@ function initializeMap() {
         maxWidth: 300
       });
       marker.addListener('click', function() {
-        CloseAllinfowindows();
+        Reset();
+        marker.setAnimation(google.maps.Animation.BOUNCE);
         ShowWiki(marker,infowindow,item.wikiurl);
       });
       markers.push(marker);
@@ -180,9 +181,12 @@ function initializeMap() {
   addMarkers();
 
   // close all infowindows
-  function CloseAllinfowindows(){
+  function Reset(){
     infowindows.forEach(function(infowindow){
       infowindow.close();
+    });
+    markers.forEach(function(marker){
+      marker.setAnimation(null);
     });
   }
 
