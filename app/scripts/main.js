@@ -135,19 +135,30 @@ function POI(location){
 function AppViewModel() {
   var self = this;
   // initialize search string
-  self.SearchVal = ko.observable("");
+  self.filter = ko.observable('');
+
   // initialize Point of interests observable array
   self.POIs = ko.observableArray([]);
   museums.forEach(function(location){
     self.POIs.push(new POI(location));
   });
-  //
+
+  self.filteredPOIs = ko.computed(function () {
+    var filter = self.filter().toLowerCase();
+    if (!filter) {
+      return self.POIs();
+    } else {
+      return ko.utils.arrayFilter(self.POIs(), function (POI) {
+        return POI.name.toLowerCase().indexOf(filter) !== -1;
+      });
+    }}, self);
+
   self.reset = function(){
     self.POIs().forEach(function(POI){
       POI.infowindow.close();
       POI.marker.setAnimation(null);
     });
-  }
+  };
   // initialize current POI
   self.currentPOI = self.POIs()[0];
   // Change focus on selected item

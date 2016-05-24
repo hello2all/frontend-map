@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>frontend map</title>
+    <title>Local Museum Guide</title>
 
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
@@ -26,16 +26,16 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <nav id="myNavmenu" class="navmenu navmenu-inverse navmenu-fixed-left offcanvas" role="navigation">
-      <a class="navmenu-brand" href="#">Local Guide</a>
+      <a class="navmenu-brand" href="#">Local Museum Guide</a>
       <div class="input-group">
-        <input type="text" class="form-control" data-bind="value:SearchVal" placeholder="restaurant">
+        <input type="text" class="form-control" data-bind="value:filter, valueUpdate: 'afterkeydown'" placeholder="Keyword">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button">
             <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
           </button>
         </span>
       </div>
-      <ul id="myNavlist" class="nav navmenu-nav" data-bind="foreach: POIs">
+      <ul id="myNavlist" class="nav navmenu-nav" data-bind="foreach: filteredPOIs">
         <li data-bind="click: $parent.select, css: { active: selected}"><a href="#" data-bind="text: name"></a></li>
       </ul>
     </nav>
