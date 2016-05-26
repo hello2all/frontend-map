@@ -121,15 +121,25 @@ function POI(location){
     position: new google.maps.LatLng(location.lat,location.lng),
     map: map
   });
+  markers.push(self.marker);
   self.infowindow = new google.maps.InfoWindow({
     content: self.name,
     maxWidth: 300
   });
-
+  infowindows.push(self.infowindow);
   self.marker.addListener('click', function() {
     self.marker.setAnimation(google.maps.Animation.BOUNCE);
     ShowWiki(self.marker,self.infowindow,self.wikiurl);
   });
+  self.isVisible = ko.observable(false);
+  self.isVisible.subscribe(function(currentState) {
+    if (currentState) {
+      self.marker.setMap(map);
+    } else {
+      self.marker.setMap(null);
+    }
+  });
+  self.isVisible(true);
   self.selected = ko.observable(false); // Flag for selected item in list
 }
 function AppViewModel() {
@@ -149,7 +159,9 @@ function AppViewModel() {
       return self.POIs();
     } else {
       return ko.utils.arrayFilter(self.POIs(), function (POI) {
-        return POI.name.toLowerCase().indexOf(filter) !== -1;
+        var doesmatch =  POI.name.toLowerCase().indexOf(filter) !== -1;
+        POI.isVisible(doesmatch);
+        return doesmatch;
       });
     }}, self);
 
