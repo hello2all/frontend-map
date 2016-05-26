@@ -1,3 +1,6 @@
+/*
+Museums data
+*/
 var museums = [
   {
     "name": "ArtScience Museum",
@@ -112,29 +115,37 @@ var museums = [
 /*
 MVVM
 */
-// Point of interest object
+
+// Point of interest object, with marker and infowindow linked
 function POI(location){
   var self = this;
   self.name = location.name;
   self.wikiurl = location.wikiurl;
+  // Bind marker to this object
   self.marker = new google.maps.Marker({
     position: new google.maps.LatLng(location.lat,location.lng),
     map: map
   });
   markers.push(self.marker);
+  // Bind infowindow
   self.infowindow = new google.maps.InfoWindow({
     content: self.name,
     maxWidth: 300
   });
   infowindows.push(self.infowindow);
+  // Event listener when the marker is clicked
   self.marker.addListener('click', function() {
+    // reset all animations and close all infowindows
     for(var i = 0; i < markers.length; i++){
       markers[i].setAnimation(null);
       infowindows[i].close();
     }
+    // Activate animation
     self.marker.setAnimation(google.maps.Animation.BOUNCE);
+    // retrieve async data and display in infowindow
     ShowWiki(self.marker,self.infowindow,self.wikiurl);
   });
+  // Visibility in map
   self.isVisible = ko.observable(false);
   self.isVisible.subscribe(function(currentState) {
     if (currentState) {
@@ -144,8 +155,11 @@ function POI(location){
     }
   });
   self.isVisible(true);
+  // Style change in list
   self.selected = ko.observable(false); // Flag for selected item in list
 }
+
+// ViewModel
 function AppViewModel() {
   var self = this;
   // initialize search string
@@ -156,36 +170,40 @@ function AppViewModel() {
   museums.forEach(function(location){
     self.POIs.push(new POI(location));
   });
-
+  // Location filter
   self.filteredPOIs = ko.computed(function () {
-    var filter = self.filter().toLowerCase();
+    var filter = self.filter().toLowerCase(); // case insensitive
     if (!filter) {
       return self.POIs();
     } else {
       return ko.utils.arrayFilter(self.POIs(), function (POI) {
         var doesmatch =  POI.name.toLowerCase().indexOf(filter) !== -1;
+        // Change visibility
         POI.isVisible(doesmatch);
         return doesmatch;
       });
     }}, self);
 
 
-  // initialize current POI
+  // initialize current POI in list
   self.currentPOI = self.POIs()[0];
   // Change focus on selected item
   self.select = function(selectedPOI){
     self.currentPOI.selected(false);
     self.currentPOI = selectedPOI;
     self.currentPOI.selected(true);
+    // trigger marker click event
     google.maps.event.trigger(self.currentPOI.marker, 'click');
   };
 }
 
 
-
+/*
+Map Model
+*/
 var map;    // declares a global map variable
-var markers = [];
-var infowindows = [];
+var markers = []; // array for all generated markers
+var infowindows = []; // array for all generated infowindows
 function initializeMap() {
 
   var locations;
