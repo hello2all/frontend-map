@@ -128,6 +128,10 @@ function POI(location){
   });
   infowindows.push(self.infowindow);
   self.marker.addListener('click', function() {
+    for(var i = 0; i < markers.length; i++){
+      markers[i].setAnimation(null);
+      infowindows[i].close();
+    }
     self.marker.setAnimation(google.maps.Animation.BOUNCE);
     ShowWiki(self.marker,self.infowindow,self.wikiurl);
   });
@@ -165,12 +169,7 @@ function AppViewModel() {
       });
     }}, self);
 
-  self.reset = function(){
-    self.POIs().forEach(function(POI){
-      POI.infowindow.close();
-      POI.marker.setAnimation(null);
-    });
-  };
+
   // initialize current POI
   self.currentPOI = self.POIs()[0];
   // Change focus on selected item
@@ -178,7 +177,6 @@ function AppViewModel() {
     self.currentPOI.selected(false);
     self.currentPOI = selectedPOI;
     self.currentPOI.selected(true);
-    self.reset();
     google.maps.event.trigger(self.currentPOI.marker, 'click');
   };
 }
