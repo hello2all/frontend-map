@@ -4,7 +4,7 @@ Open dist/index.html to run
 
 Attention
 =================
-This project is scaffolded using yeoman, directly open app/index.html will not work(although I'm not sure what is the mechanism behind, maybe it's because of bower components).
+This project was scaffolded using yeoman, directly open app/index.html will not work(although I'm not sure what is the mechanism behind, maybe it's because of bower components).
 
 For easier reviewing, pls run the following commands
 ~~~
