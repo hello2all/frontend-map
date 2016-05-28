@@ -221,6 +221,12 @@ function initializeMap() {
   // Activates knockout.js
   ko.applyBindings(new AppViewModel());
 }
+/*
+google maps async error handling
+*/
+function mapInitErr(){
+  $('main').append('<p>google maps was stolen T_T, try to refresh this page</p>');
+}
 
 /*
 Asynchronously retrieve info from wikipedia

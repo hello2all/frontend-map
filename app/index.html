@@ -46,7 +46,7 @@
         <span class="icon-bar"></span>
       </button>
     </div>
-    <div id="map_canvas"></div>
+    <main id="map_canvas"></main>
 
 
     <!-- Google Analytics-->
@@ -58,8 +58,6 @@
       r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
       ga('create','UA-76822576-1');ga('send','pageview');
     </script>
-    <!-- Google Maps -->
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxqSf_g6AOLdXyYJNkgH-TJCFfSntAYjU&callback=initializeMap&libraries=places" async defer></script>
 
 
     <!-- build:js scripts/vendor.js -->
@@ -88,5 +86,9 @@
     <!-- build:js scripts/main.js -->
     <script src="scripts/main.js"></script>
     <!-- endbuild -->
+
+    <!-- Google Maps -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxqSf_g6AOLdXyYJNkgH-TJCFfSntAYjU&callback=initializeMap" onerror="mapInitErr()" async defer></script>
+
   </body>
 </html>
