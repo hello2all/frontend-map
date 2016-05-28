@@ -1,3 +1,4 @@
+'use strict'; // turn on Strict Mode
 /*
 Museums data
 */
@@ -127,34 +128,27 @@ function POI(location){
     map: map
   });
   markers.push(self.marker);
-  // Bind infowindow
-  self.infowindow = new google.maps.InfoWindow({
-    content: self.name,
-    maxWidth: 300
-  });
-  infowindows.push(self.infowindow);
+
   // Event listener when the marker is clicked
   self.marker.addListener('click', function() {
-    // reset all animations and close all infowindows
+    // reset all animations
     for(var i = 0; i < markers.length; i++){
       markers[i].setAnimation(null);
-      infowindows[i].close();
     }
     // Activate animation
     self.marker.setAnimation(google.maps.Animation.BOUNCE);
     // retrieve async data and display in infowindow
-    ShowWiki(self.marker,self.infowindow,self.wikiurl);
+    ShowWiki(self.marker,infowindow,self.wikiurl);
   });
   // Visibility in map
-  self.isVisible = ko.observable(false);
-  self.isVisible.subscribe(function(currentState) {
-    if (currentState) {
-      self.marker.setMap(map);
+  self.markerVisible = function(toggleSwitch) {
+    if (toggleSwitch) {
+      self.marker.setVisible(true);
     } else {
-      self.marker.setMap(null);
+      self.marker.setVisible(false);
     }
-  });
-  self.isVisible(true);
+  };
+
   // Style change in list
   self.selected = ko.observable(false); // Flag for selected item in list
 }
@@ -173,16 +167,14 @@ function AppViewModel() {
   // Location filter
   self.filteredPOIs = ko.computed(function () {
     var filter = self.filter().toLowerCase(); // case insensitive
-    if (!filter) {
-      return self.POIs();
-    } else {
-      return ko.utils.arrayFilter(self.POIs(), function (POI) {
-        var doesmatch =  POI.name.toLowerCase().indexOf(filter) !== -1;
-        // Change visibility
-        POI.isVisible(doesmatch);
-        return doesmatch;
-      });
-    }}, self);
+
+    return ko.utils.arrayFilter(self.POIs(), function (POI) {
+      var doesmatch =  POI.name.toLowerCase().indexOf(filter) !== -1;
+      // Change visibility
+      POI.markerVisible(doesmatch);
+      return doesmatch;
+    });
+  }, self);
 
 
   // initialize current POI in list
@@ -201,9 +193,10 @@ function AppViewModel() {
 /*
 Map Model
 */
-var map;    // declares a global map variable
-var markers = []; // array for all generated markers
-var infowindows = []; // array for all generated infowindows
+var map,   // declares a global map variable
+    infowindow, // global infowindow
+    markers = []; // array for all generated markers
+
 function initializeMap() {
 
   var locations;
@@ -213,6 +206,18 @@ function initializeMap() {
     disableDefaultUI: true
   };
   map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+
+  // init infowindow
+  infowindow = new google.maps.InfoWindow({
+    maxWidth: 300
+  });
+
+  // stop marker animation when infowindow is closed
+  google.maps.event.addListener(infowindow, 'closeclick', function() {
+      markers.forEach(function(marker){
+        marker.setAnimation(null);
+      });
+  });
   // Activates knockout.js
   ko.applyBindings(new AppViewModel());
 }
@@ -222,6 +227,8 @@ Asynchronously retrieve info from wikipedia
 */
 function ShowWiki(marker,infowindow,wikiurl)
 {
+  infowindow.setPosition(marker.getPosition());
+  infowindow.open(map,marker);
   // construct parse url to retrieve the first section
   var parseUrl = 'http://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&callback=?&page=' + wikiurl.replace('https://en.wikipedia.org/wiki/', '');
   var HTMLlink = '<p><a href=\'%data%\'>More info...</a></p>';
@@ -246,7 +253,7 @@ function ShowWiki(marker,infowindow,wikiurl)
       i = i.find('p').html();
       // load results into infowindow
       infowindow.setContent(i + HTMLlink.replace('%data%',wikiurl));
-      infowindow.open(map,marker);
+
     },
     error: function () {
       // throw error message
