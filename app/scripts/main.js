@@ -93,7 +93,7 @@ function initializeMap() {
     zoom: 14,
     disableDefaultUI: true
   };
-  map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
   // init infowindow
   infowindow = new google.maps.InfoWindow({
