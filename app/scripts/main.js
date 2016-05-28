@@ -258,7 +258,7 @@ function ShowWiki(marker,infowindow,wikiurl)
     },
     error: function () {
       // throw error message
-      alert('Error on retrieving intro from wikipedia');
+      infowindow.setContent('Error on retrieving intro from wikipedia');
     }
   });
 }
