@@ -122,6 +122,7 @@ Asynchronously retrieve info from wikipedia
 function ShowWiki(marker,infowindow,wikiurl)
 {
   infowindow.setPosition(marker.getPosition());
+  // display spinning circle
   infowindow.setContent('<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>');
   infowindow.open(map,marker);
   // construct parse url to retrieve the first section
